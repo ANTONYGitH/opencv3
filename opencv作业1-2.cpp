@@ -1,4 +1,4 @@
-﻿//作业2 配置好OpenCV，随便显示一幅图像。附上代码和显示结果截图
+//作业2 配置好OpenCV，随便显示一幅图像。附上代码和显示结果截图
 //#include <opencv2/core.hpp>
 //#include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
