@@ -1,39 +1,78 @@
-//×÷Òµ2 ÕÒÒ»·ùÍ¼Ïñ£¬¶ÔÔ­Í¼½øĞĞÖĞÖµÂË²¨£¬ÏÔÊ¾Ğ§¹û£»SobleËã×ÓÌáÈ¡±ßÔµ£¬ÏÔÊ¾Ğ§¹û¡£
-#include "opencv2/core/core.hpp" 
-#include "opencv2/highgui/highgui.hpp" 
-#include "opencv2/imgproc/imgproc.hpp" 
- 
+//ä½œä¸š2 æ‰¾ä¸€å¹…äººç‰©å›¾åƒï¼Œæ˜¾ç¤ºå®ƒçš„ç›´æ–¹å›¾ï¼›å¯¹åŸå›¾è¿›è¡Œç›´æ–¹å›¾å‡åŒ€ï¼Œæ˜¾ç¤ºæ•ˆæœã€‚
+#include<opencv2/opencv.hpp>
+#include<iostream>
 using namespace cv;
+
+Mat Histogram(Mat XQA_in);//ç”±äºè¦ç»˜åˆ¶ä¸¤æ¬¡ç›´æ–¹å›¾ï¼Œæ‰€ä»¥æˆ‘ç›´æ¥æŠŠç»˜åˆ¶çš„ä»£ç å†™æˆå­ç¨‹åºï¼Œä»¥ä¾¿è°ƒç”¨
 
 int main()
 {
-	Mat XQAImage = imread("ÂåÑôÈÕ±¨.jpg");//Ô­Í¼
-	Mat medianBlurImage;//ÖĞÖµÂË²¨ºóµÄÍ¼
-	Mat out_xImage, out_yImage;//Sobel
-	Mat abs_x, abs_y;
-	Mat SobelImage;//SobelÌáÈ¡ºóµÄÍ¼
+    Mat XQAImage = imread("æ´›é˜³æ—¥æŠ¥.jpg");
+	if (!XQAImage.data)
+	{
+		printf("\nã€æç¤ºã€‘è¯»å–å›¾åƒé”™è¯¯,è¯·æ£€æŸ¥ä»£ç ä¸­çš„å‘½åå’Œå›¾åƒæ˜¯å¦ä¸€è‡´ã€‚\n");
+		system("pause");
+		return 0;
+	}
 
-	//ÖĞÖµÂË²¨
-	medianBlur(XQAImage, medianBlurImage, 7);
-	//ÓÃsobelËã×ÓÌáÈ¡±ßÔµ
-	Sobel(XQAImage, out_xImage, CV_64F, 1, 0, 1, 1, 1, BORDER_DEFAULT);//Çóx·½ÏòÌİ¶È,µÚ6¸ö²ÎÊıÎªsobleÄÚºË£¬ºÜÖØÒª
-	convertScaleAbs(out_xImage, abs_x);
-	Sobel(XQAImage, out_yImage, CV_64F, 0, 1, 1, 1, 1, BORDER_DEFAULT);//Çóy·½ÏòÌİ¶È
-	convertScaleAbs(out_yImage, abs_y);
-	addWeighted(abs_x, 0.5, abs_y, 0.5, 0, SobelImage);
-	//ÏÔÊ¾Í¼Ïñ
-	namedWindow("¡¾Ô­Í¼¡¿ÈËÎïÍ¼Ïñ-XQA", 0);
-	resizeWindow("¡¾Ô­Í¼¡¿ÈËÎïÍ¼Ïñ-XQA", 400, 270);
-	imshow("¡¾Ô­Í¼¡¿ÈËÎïÍ¼Ïñ-XQA", XQAImage);
-	namedWindow("¡¾Ğ§¹ûÍ¼¡¿ÖĞÖµÂË²¨ºó-XQA", 0);
-	resizeWindow("¡¾Ğ§¹ûÍ¼¡¿ÖĞÖµÂË²¨ºó-XQA", 400, 270);
-	imshow("¡¾Ğ§¹ûÍ¼¡¿ÖĞÖµÂË²¨ºó-XQA", medianBlurImage);
-	namedWindow("¡¾Ğ§¹ûÍ¼¡¿SobelÌáÈ¡ºó-XQA", 0);
-	resizeWindow("¡¾Ğ§¹ûÍ¼¡¿SobelÌáÈ¡ºó-XQA", 400, 270);
-	imshow("¡¾Ğ§¹ûÍ¼¡¿SobelÌáÈ¡ºó-XQA", SobelImage);
+	namedWindow("ã€åŸå›¾ã€‘äººç‰©å›¾åƒ-XQA", 0);
+	resizeWindow("ã€åŸå›¾ã€‘äººç‰©å›¾åƒ-XQA", 400, 270);
+	imshow("ã€åŸå›¾ã€‘äººç‰©å›¾åƒ-XQA", XQAImage);
+	
+	//ç›´æ–¹å›¾å‡è¡¡ï¼ˆå½©å›¾å‡è¡¡ã€ç°åº¦åŒ–åå‡è¡¡ï¼‰
+	Mat Equ_XQAImage, Equ_XQAImageGRAY;
+	//å½©å›¾å‡è¡¡
+	std::vector<Mat> mv;
+	split(XQAImage, mv);
+	equalizeHist(mv[0], mv[0]);//0ã€1ã€2æ˜¯ä¸‰é€šé“
+	equalizeHist(mv[1], mv[1]);
+	equalizeHist(mv[2], mv[2]);
+	merge(mv, Equ_XQAImage);
+	namedWindow("ã€ç›´æ–¹å›¾å‡è¡¡åŒ–åçš„å›¾ã€‘äººç‰©å›¾åƒ-XQA", 0);
+	resizeWindow("ã€ç›´æ–¹å›¾å‡è¡¡åŒ–åçš„å›¾ã€‘äººç‰©å›¾åƒ-XQA", 400, 270);
+	imshow("ã€ç›´æ–¹å›¾å‡è¡¡åŒ–åçš„å›¾ã€‘äººç‰©å›¾åƒ-XQA", Equ_XQAImage);
+	//ç°åº¦åŒ–åå‡è¡¡
+	cvtColor(XQAImage, XQAImage,COLOR_BGR2GRAY);//COLOR_BGR2GRAYç°åº¦åŒ–
+	equalizeHist(XQAImage, Equ_XQAImageGRAY);
+	namedWindow("ã€ç›´æ–¹å›¾å‡è¡¡åŒ–åçš„å›¾(ç°)ã€‘äººç‰©å›¾åƒ-XQA", 0);
+	resizeWindow("ã€ç›´æ–¹å›¾å‡è¡¡åŒ–åçš„å›¾(ç°)ã€‘äººç‰©å›¾åƒ-XQA", 400, 270);
+	imshow("ã€ç›´æ–¹å›¾å‡è¡¡åŒ–åçš„å›¾(ç°)ã€‘äººç‰©å›¾åƒ-XQA",Equ_XQAImageGRAY);
+	//æ˜¾ç¤ºç›´æ–¹å›¾
+	Mat Histogram1 = Histogram(XQAImage);
+	imshow("ã€åŸå›¾çš„ç›´æ–¹å›¾ã€‘", Histogram1);
+	Mat Histogram2 = Histogram(Equ_XQAImage);
+	imshow("ã€å‡è¡¡åŒ–åçš„ç›´æ–¹å›¾ã€‘", Histogram2);
+	Mat Histogram3 = Histogram(Equ_XQAImageGRAY);
+	imshow("ã€(ç°)å‡è¡¡åŒ–åçš„ç›´æ–¹å›¾ã€‘", Histogram3);
 
 	waitKey(0);
 	destroyAllWindows();
 	return 0;
 }
-//ĞÕÃû£ºÏ¯Çì°Ä|Ñ§ºÅ£ºB21023716|Íê³ÉÊ±¼ä£º2022Äê9ÔÂ15ÈÕ18:13:50
+Mat Histogram(Mat XQA_in) {
+	Mat image, dstHist;//dstHistæ˜¯å®šä¹‰å­˜å‚¨ç›´æ–¹å›¾å˜é‡
+
+	XQA_in.copyTo(image);
+	int dims = 1;//ç›´æ–¹å›¾ç»´æ•°
+	float hranges[] = { 0, 255 };
+	const float* ranges[] = { hranges };//é˜ˆå€¼
+	int size = 256;
+	int channels = 0;
+	calcHist(&image, 1, &channels, Mat(), dstHist, dims, &size, ranges);//è®¡ç®—å›¾åƒçš„ç›´æ–¹å›¾
+	//ä»¥ä¸Šè®¡ç®—å¾—åˆ°çš„ç»“æœéƒ½å­˜å…¥dstHistä¸­
+	int scale = 1;
+	Mat dstImage(size * scale, size, CV_8U, Scalar(0));//ç›´æ–¹å›¾
+	double minValue = 0, maxValue = 0;
+	minMaxLoc(dstHist, &minValue, &maxValue, 0, 0);//æ‰¾å¯»æœ€å¤§å€¼å’Œæœ€å°å€¼
+
+	//ç»˜åˆ¶ç›´æ–¹å›¾
+	int hpt = saturate_cast<int>(0.9 * size);
+	for (int i = 0; i < 256; i++)
+	{
+		float binValue = dstHist.at<float>(i);
+		int realValue = saturate_cast<int>(binValue * hpt / maxValue);
+		rectangle(dstImage, Point(i * scale, size - 1), Point((i + 1) * scale - 1, size - realValue), Scalar(255));
+	}
+	return dstImage;
+}
+//å§“åï¼šå¸­åº†æ¾³|å­¦å·ï¼šB21023716|å®Œæˆæ—¶é—´ï¼š2022å¹´9æœˆ15æ—¥18:13:50
